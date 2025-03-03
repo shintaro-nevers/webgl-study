@@ -8,7 +8,7 @@ export default class Sketch {
 				{
 					name: "mercury",
 					size: "1",
-					texture: '/images/mercury.jpg',
+					texture: 'images/mercury.jpg',
 					rotationSpeed: 0.05,
 					revolutionSpeed: 0.01,
 					distance: 30,
@@ -16,7 +16,7 @@ export default class Sketch {
 				{
 					name: "venus",
 					size: "3",
-					texture: '/images/venus.jpg',
+					texture: 'images/venus.jpg',
 					rotationSpeed: 0.05,
 					revolutionSpeed: 0.008,
 					distance: 60,
@@ -24,7 +24,7 @@ export default class Sketch {
 				{
 					name: "earth",
 					size: "3",
-					texture: '/images/earth.png',
+					texture: 'images/earth.png',
 					rotationSpeed: 0.05,
 					revolutionSpeed: 0.006,
 					distance: 90,
@@ -32,7 +32,7 @@ export default class Sketch {
 				{
 					name: "mars",
 					size: "1.5",
-					texture: '/images/mars.jpg',
+					texture: 'images/mars.jpg',
 					rotationSpeed: 0.05,
 					revolutionSpeed: 0.004,
 					distance: 120,
@@ -40,7 +40,7 @@ export default class Sketch {
 				{
 					name: "jupiter",
 					size: "33",
-					texture: '/images/jupiter.jpg',
+					texture: 'images/jupiter.jpg',
 					rotationSpeed: 0.05,
 					revolutionSpeed: 0.002,
 					distance: 200,
@@ -48,7 +48,7 @@ export default class Sketch {
 				{
 					name: "saturn",
 					size: "27",
-					texture: '/images/saturn.jpg',
+					texture: 'images/saturn.jpg',
 					rotationSpeed: 0.05,
 					revolutionSpeed: 0.0008,
 					distance: 250,
@@ -56,7 +56,7 @@ export default class Sketch {
 				{
 					name: "uranus",
 					size: "12",
-					texture: '/images/uranus.jpg',
+					texture: 'images/uranus.jpg',
 					rotationSpeed: 0.05,
 					revolutionSpeed: 0.0006,
 					distance: 300,
@@ -64,7 +64,7 @@ export default class Sketch {
 				{
 					name: "neptune",
 					size: "12",
-					texture: '/images/neptune.jpg',
+					texture: 'images/neptune.jpg',
 					rotationSpeed: 0.05,
 					revolutionSpeed: 0.0004,
 					distance: 350,
@@ -143,7 +143,7 @@ export default class Sketch {
 
 	addObjects() {
 		// 太陽
-		this.sunTexture = new THREE.TextureLoader().load('/images/sun.jpg');
+		this.sunTexture = new THREE.TextureLoader().load('images/sun.jpg');
 		this.sunGeometry = new THREE.SphereGeometry( 10, 32, 32 );
 		this.sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff,map: this.sunTexture });
 		this.sunMesh = new THREE.Mesh(this.sunGeometry, this.sunMaterial);
