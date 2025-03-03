@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ja">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>WebGL Study</title>
+	</head>
+	<body>
+		<slot />
+	</body>
+</html>
+
+<style>
+	* {
+		margin: 0;
+		padding: 0;
+	}
+	body {
+		overscroll-behavior: none;
+	}
+	#container {
+		width: 100vw;
+		height: 100vh;
+	}
+	canvas {
+		display: block;
+	}
+</style>
