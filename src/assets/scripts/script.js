@@ -53,6 +53,7 @@ export default class Sketch {
 					rotationSpeed: 0.05,
 					revolutionSpeed: 0.0008,
 					distance: 250,
+					satellite: "saturnSatellites",
 				},
 				{
 					name: "uranus",
@@ -75,8 +76,13 @@ export default class Sketch {
 	}
 
 	static get SATELLITE_PARAMS() {
-		const moonMaterial = new THREE.MeshStandardMaterial({ map: new THREE.TextureLoader().load('images/moon.jpg') });
+		// 月のマテリアルとジオメトリ
 		const moonGeometry = new THREE.SphereGeometry(2, 32, 32);
+		const moonMaterial = new THREE.MeshStandardMaterial({ map: new THREE.TextureLoader().load('images/moon.jpg') });
+
+		// 土星の衛星のマテリアルとジオメトリ
+		const saturnSatellitesMaterial = new THREE.MeshStandardMaterial({ color:0xcdb07a  });
+		const saturnSatellitesGeometry = new THREE.TorusGeometry( 40, 8, 2, 200 );
 
 		return (
 			[
@@ -88,7 +94,16 @@ export default class Sketch {
 					rotationSpeed: 0.02,
 					revolutionSpeed: 0.1,
 					distance: 10,
-				}
+				},
+				{
+					name: "saturnSatellites",
+					material: saturnSatellitesMaterial,
+					geometry: saturnSatellitesGeometry,
+					planet: "saturn",
+					rotationSpeed: 0.01,
+					revolutionSpeed: 0,
+					distance: 0,
+				},
 			]
 		);
 	}
@@ -230,12 +245,12 @@ export default class Sketch {
 		Sketch.SATELLITE_PARAMS.forEach((satellite) => {
 			// 衛星の公転速度
 			this[satellite.name + "Group"].rotation.y += satellite.revolutionSpeed;
-			// 衛星の公転の中心（惑星の太陽からの位置）
+			// 衛星の公転の中心（惑星から太陽までの位置）
 			const planetDistance = Sketch.PLANET_PARAMS.find(planet => planet.name === satellite.planet).distance;
 			this[satellite.name + "Group"].position.set(0, 0, planetDistance);
 			// 衛星の自転速度
 			this[satellite.name + "Mesh"].rotation.y += satellite.rotationSpeed;
-			// 衛星の惑星からの距離
+			// 惑星から衛星までの距離
 			this[satellite.name + "Mesh"].position.set(0.0, 0.0, satellite.distance);
 		})
 
@@ -244,7 +259,7 @@ export default class Sketch {
 			this[planet.name + "Group"].rotation.y += planet.revolutionSpeed;
 			// 惑星の自転速度
 			this[planet.name + "Mesh"].rotation.y += planet.rotationSpeed;
-			// 太陽からの距離
+			// 太陽から惑星までの距離
 			this[planet.name + "Mesh"].position.set(0.0, 0.0, planet.distance);
 		})
 
