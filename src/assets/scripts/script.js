@@ -7,69 +7,69 @@ export default class Sketch {
 			[
 				{
 					name: "mercury",
-					size: "1",
+					size: "2441",
 					texture: 'images/mercury.jpg',
 					rotationSpeed: 0.05,
 					revolutionSpeed: 0.01,
-					distance: 30,
+					distance: 0.39,
 				},
 				{
 					name: "venus",
-					size: "3",
+					size: "6052",
 					texture: 'images/venus.jpg',
 					rotationSpeed: 0.05,
 					revolutionSpeed: 0.008,
-					distance: 60,
+					distance: 0.72,
 				},
 				{
 					name: "earth",
-					size: "3",
+					size: "6378",
 					texture: 'images/earth.png',
 					rotationSpeed: 0.05,
 					revolutionSpeed: 0.006,
-					distance: 90,
+					distance: 1,
 					satellite: "moon",
 				},
 				{
 					name: "mars",
-					size: "1.5",
+					size: "3396",
 					texture: 'images/mars.jpg',
 					rotationSpeed: 0.05,
 					revolutionSpeed: 0.004,
-					distance: 120,
+					distance: 1.52,
 				},
 				{
 					name: "jupiter",
-					size: "33",
+					size: "71492",
 					texture: 'images/jupiter.jpg',
 					rotationSpeed: 0.05,
 					revolutionSpeed: 0.002,
-					distance: 200,
+					distance: 5.20,
 				},
 				{
 					name: "saturn",
-					size: "27",
+					size: "60268",
 					texture: 'images/saturn.jpg',
 					rotationSpeed: 0.05,
 					revolutionSpeed: 0.0008,
-					distance: 250,
+					distance: 9.54,
 					satellite: "saturnSatellites",
 				},
 				{
 					name: "uranus",
-					size: "12",
+					size: "25559",
 					texture: 'images/uranus.jpg',
 					rotationSpeed: 0.05,
 					revolutionSpeed: 0.0006,
-					distance: 300,
+					distance: 19.19,
 				},
 				{
 					name: "neptune",
-					size: "12",
+					size: "24764",
 					texture: 'images/neptune.jpg',
 					rotationSpeed: 0.05,
 					revolutionSpeed: 0.0004,
-					distance: 350,
+					distance: 30.07,
 				},
 			]
 		)
@@ -82,7 +82,7 @@ export default class Sketch {
 
 		// 土星の衛星のマテリアルとジオメトリ
 		const saturnSatellitesMaterial = new THREE.MeshStandardMaterial({ color:0xcdb07a  });
-		const saturnSatellitesGeometry = new THREE.TorusGeometry( 40, 8, 2, 200 );
+		const saturnSatellitesGeometry = new THREE.TorusGeometry( 80, 10, 2, 200 );
 
 		return (
 			[
@@ -100,7 +100,7 @@ export default class Sketch {
 					material: saturnSatellitesMaterial,
 					geometry: saturnSatellitesGeometry,
 					planet: "saturn",
-					rotationSpeed: 0.01,
+					rotationSpeed: 0.0,
 					revolutionSpeed: 0,
 					distance: 0,
 				},
@@ -123,7 +123,7 @@ export default class Sketch {
 		this.scene = new THREE.Scene();
 
 		// シーンにフォグを追加
-		this.scene.fog = new THREE.Fog(new THREE.Color(0x000000), 1, 1500);
+		// this.scene.fog = new THREE.Fog(new THREE.Color(0x000000), 1, 2000);
 
 
 		// カメラ
@@ -131,7 +131,7 @@ export default class Sketch {
 			60,
 			window.innerWidth / window.innerHeight,
 			0.1,
-			5000,
+			50000,
 		);
 		this.camera.position.set(10,30,100);
 		this.camera.lookAt(new THREE.Vector3(0.0, 0.0, 0.0));
@@ -176,6 +176,14 @@ export default class Sketch {
 		}, false);
 	}
 
+	filterDistance(distance) {
+		return distance * 100;
+	}
+
+	filterPlanetSize(size) {
+		return size / 1000;
+	}
+
 	addObjects() {
 		// 太陽
 		this.sunTexture = new THREE.TextureLoader().load('images/sun.jpg');
@@ -189,13 +197,20 @@ export default class Sketch {
 			this[satellite.name + "Group"] = new THREE.Group();
 			this[satellite.name + "Mesh"] = new THREE.Mesh(satellite.geometry, satellite.material);
 			this[satellite.name + "Group"].add(this[satellite.name + "Mesh"]);
+
+			// 土星の衛星を90度回転させる
+			if (satellite.name === "saturnSatellites") {
+				this[satellite.name + "Mesh"].rotation.x = Math.PI / 2; // 90度回転
+			}
 		});
 
 		// 惑星の生成
 		Sketch.PLANET_PARAMS.forEach((planet) => {
+			const filteredSize = this.filterPlanetSize(planet.size)
+
 			this[planet.name + "Group"] = new THREE.Group();
 			this[planet.name + "Texture"] = new THREE.TextureLoader().load(planet.texture);
-			this[planet.name + "Geometry"] = new THREE.SphereGeometry( planet.size, 32, 32 );
+			this[planet.name + "Geometry"] = new THREE.SphereGeometry( filteredSize, 32, 32 );
 			this[planet.name + "Material"] = new THREE.MeshStandardMaterial({ map: this[planet.name + "Texture"] });
 			this[planet.name + "Mesh"] = new THREE.Mesh(this[planet.name + "Geometry"], this[planet.name + "Material"]);
 			planet.satellite ? this[planet.name + "Group"].add(this[planet.name + "Mesh"],this[planet.satellite + "Group"]) : this[planet.name + "Group"].add(this[planet.name + "Mesh"]);
@@ -205,12 +220,12 @@ export default class Sketch {
 		// 小さい星
 		this.starGeometry = new THREE.SphereGeometry( 0.1, 32, 32 );
 		this.starMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
-		for (let i = 0; i <= 20000; ++i) {
+		for (let i = 0; i <= 30000; ++i) {
 			this.starMesh = new THREE.Mesh(this.starGeometry, this.starMaterial);
 			// 座標をランダムに散らす
-			this.starMesh.position.x = (Math.random() * 2.0 - 1.0) * 500;
-			this.starMesh.position.y = (Math.random() * 2.0 - 1.0) * 500;
-			this.starMesh.position.z = (Math.random() * 2.0 - 1.0) * 500;
+			this.starMesh.position.x = (Math.random() * 2.0 - 1.0) * 1000;
+			this.starMesh.position.y = (Math.random() * 2.0 - 1.0) * 1000;
+			this.starMesh.position.z = (Math.random() * 2.0 - 1.0) * 1000;
 			// シーンに追加する
 			this.scene.add(this.starMesh);
 		}
@@ -246,7 +261,7 @@ export default class Sketch {
 			// 衛星の公転速度
 			this[satellite.name + "Group"].rotation.y += satellite.revolutionSpeed;
 			// 衛星の公転の中心（惑星から太陽までの位置）
-			const planetDistance = Sketch.PLANET_PARAMS.find(planet => planet.name === satellite.planet).distance;
+			const planetDistance = this.filterDistance(Sketch.PLANET_PARAMS.find(planet => planet.name === satellite.planet).distance);
 			this[satellite.name + "Group"].position.set(0, 0, planetDistance);
 			// 衛星の自転速度
 			this[satellite.name + "Mesh"].rotation.y += satellite.rotationSpeed;
@@ -260,7 +275,7 @@ export default class Sketch {
 			// 惑星の自転速度
 			this[planet.name + "Mesh"].rotation.y += planet.rotationSpeed;
 			// 太陽から惑星までの距離
-			this[planet.name + "Mesh"].position.set(0.0, 0.0, planet.distance);
+			this[planet.name + "Mesh"].position.set(0.0, 0.0, this.filterDistance(planet.distance));
 		})
 
 		// 描画フェーズ
