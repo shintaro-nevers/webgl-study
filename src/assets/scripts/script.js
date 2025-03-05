@@ -123,7 +123,7 @@ export default class Sketch {
 		this.scene = new THREE.Scene();
 
 		// シーンにフォグを追加
-		// this.scene.fog = new THREE.Fog(new THREE.Color(0x000000), 1, 2000);
+		this.scene.fog = new THREE.Fog(new THREE.Color(0x000000), 1, 2000);
 
 
 		// カメラ
