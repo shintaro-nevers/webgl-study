@@ -123,7 +123,7 @@ export default class Sketch {
 		this.scene = new THREE.Scene();
 
 		// シーンにフォグを追加
-		this.scene.fog = new THREE.Fog(new THREE.Color(0x000000), 1, 2000);
+		// this.scene.fog = new THREE.Fog(new THREE.Color(0x000000), 1, 2000);
 
 
 		// カメラ
@@ -218,17 +218,30 @@ export default class Sketch {
 		})
 
 		// 小さい星
-		this.starGeometry = new THREE.SphereGeometry( 0.1, 32, 32 );
-		this.starMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
-		for (let i = 0; i <= 30000; ++i) {
-			this.starMesh = new THREE.Mesh(this.starGeometry, this.starMaterial);
-			// 座標をランダムに散らす
-			this.starMesh.position.x = (Math.random() * 2.0 - 1.0) * 1000;
-			this.starMesh.position.y = (Math.random() * 2.0 - 1.0) * 1000;
-			this.starMesh.position.z = (Math.random() * 2.0 - 1.0) * 1000;
-			// シーンに追加する
-			this.scene.add(this.starMesh);
+		// 形状データを作成
+		const SIZE = 3000;
+		// 配置する個数
+		const LENGTH = 2000;
+		// 頂点情報を格納する配列
+		const vertices = [];
+		for (let i = 0; i < LENGTH; i++) {
+			const x = SIZE * (Math.random() * 2.0 - 1.0);
+			const y = SIZE * (Math.random() * 2.0 - 1.0);
+			const z = SIZE * (Math.random() * 2.0 - 1.0);
+
+			vertices.push(x, y, z);
 		}
+
+		// 形状データを作成
+		this.starsGeometry = new THREE.BufferGeometry();
+		this.starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+
+		// マテリアルを作成
+		this.starsMaterial = new THREE.PointsMaterial({ size: 1, color: 0xffffff });
+
+		// 物体を作成
+		this.starsMesh = new THREE.Points(this.starsGeometry, this.starsMaterial);
+		this.scene.add(this.starsMesh);
 	}
 
 	addLight() {
