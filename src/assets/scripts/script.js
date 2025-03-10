@@ -13,7 +13,7 @@ export default class Sketch {
 					size: "2441",
 					texture: 'images/mercury.jpg',
 					rotationSpeed: 0.05,
-					revolutionSpeed: 0.01,
+					revolutionSpeed: 1/0.241,
 					distance: 390,
 				},
 				{
@@ -21,7 +21,7 @@ export default class Sketch {
 					size: "6052",
 					texture: 'images/venus.jpg',
 					rotationSpeed: 0.05,
-					revolutionSpeed: 0.008,
+					revolutionSpeed: 1/0.615,
 					distance: 720,
 				},
 				{
@@ -29,7 +29,7 @@ export default class Sketch {
 					size: "6378",
 					texture: 'images/earth.png',
 					rotationSpeed: 0.05,
-					revolutionSpeed: 0.006,
+					revolutionSpeed: 1,
 					distance: 1000,
 					satellite: "moon",
 				},
@@ -38,7 +38,7 @@ export default class Sketch {
 					size: "3396",
 					texture: 'images/mars.jpg',
 					rotationSpeed: 0.05,
-					revolutionSpeed: 0.004,
+					revolutionSpeed: 1/1.881,
 					distance: 1520,
 				},
 				{
@@ -46,7 +46,7 @@ export default class Sketch {
 					size: "71492",
 					texture: 'images/jupiter.jpg',
 					rotationSpeed: 0.05,
-					revolutionSpeed: 0.002,
+					revolutionSpeed: 1/11.862,
 					distance: 5200,
 				},
 				{
@@ -54,7 +54,7 @@ export default class Sketch {
 					size: "60268",
 					texture: 'images/saturn.jpg',
 					rotationSpeed: 0.05,
-					revolutionSpeed: 0.0008,
+					revolutionSpeed: 1/29.459,
 					distance: 9540,
 					satellite: "saturnSatellites",
 				},
@@ -63,7 +63,7 @@ export default class Sketch {
 					size: "25559",
 					texture: 'images/uranus.jpg',
 					rotationSpeed: 0.05,
-					revolutionSpeed: 0.0006,
+					revolutionSpeed: 1/84.023,
 					distance: 19190,
 				},
 				{
@@ -71,7 +71,7 @@ export default class Sketch {
 					size: "24764",
 					texture: 'images/neptune.jpg',
 					rotationSpeed: 0.05,
-					revolutionSpeed: 0.0004,
+					revolutionSpeed: 1/164.772,
 					distance: 30070,
 				},
 			]
@@ -205,6 +205,10 @@ export default class Sketch {
 		}
 	}
 
+	static filterRevolution(revolutionSpeed) {
+		return revolutionSpeed * 0.01;
+	}
+
 	addObjects() {
 		// 太陽
 		this.sunTexture = new THREE.TextureLoader().load('images/sun.jpg');
@@ -313,7 +317,7 @@ export default class Sketch {
 
 		Sketch.PLANET_PARAMS.forEach((planet) => {
 			// 惑星の公転速度
-			this[planet.name + "Group"].rotation.y += planet.revolutionSpeed;
+			this[planet.name + "Group"].rotation.y += Sketch.filterRevolution(planet.revolutionSpeed);
 			// 惑星の自転速度
 			this[planet.name + "Mesh"].rotation.y += planet.rotationSpeed;
 			// 太陽から惑星までの距離
