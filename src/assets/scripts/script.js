@@ -1,5 +1,8 @@
 import * as THREE from 'three';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
 
 export default class Sketch {
 	static get PLANET_PARAMS() {
@@ -11,7 +14,7 @@ export default class Sketch {
 					texture: 'images/mercury.jpg',
 					rotationSpeed: 0.05,
 					revolutionSpeed: 0.01,
-					distance: 0.39,
+					distance: 390,
 				},
 				{
 					name: "venus",
@@ -19,7 +22,7 @@ export default class Sketch {
 					texture: 'images/venus.jpg',
 					rotationSpeed: 0.05,
 					revolutionSpeed: 0.008,
-					distance: 0.72,
+					distance: 720,
 				},
 				{
 					name: "earth",
@@ -27,7 +30,7 @@ export default class Sketch {
 					texture: 'images/earth.png',
 					rotationSpeed: 0.05,
 					revolutionSpeed: 0.006,
-					distance: 1,
+					distance: 1000,
 					satellite: "moon",
 				},
 				{
@@ -36,7 +39,7 @@ export default class Sketch {
 					texture: 'images/mars.jpg',
 					rotationSpeed: 0.05,
 					revolutionSpeed: 0.004,
-					distance: 1.52,
+					distance: 1520,
 				},
 				{
 					name: "jupiter",
@@ -44,7 +47,7 @@ export default class Sketch {
 					texture: 'images/jupiter.jpg',
 					rotationSpeed: 0.05,
 					revolutionSpeed: 0.002,
-					distance: 5.20,
+					distance: 5200,
 				},
 				{
 					name: "saturn",
@@ -52,7 +55,7 @@ export default class Sketch {
 					texture: 'images/saturn.jpg',
 					rotationSpeed: 0.05,
 					revolutionSpeed: 0.0008,
-					distance: 9.54,
+					distance: 9540,
 					satellite: "saturnSatellites",
 				},
 				{
@@ -61,7 +64,7 @@ export default class Sketch {
 					texture: 'images/uranus.jpg',
 					rotationSpeed: 0.05,
 					revolutionSpeed: 0.0006,
-					distance: 19.19,
+					distance: 19190,
 				},
 				{
 					name: "neptune",
@@ -69,7 +72,7 @@ export default class Sketch {
 					texture: 'images/neptune.jpg',
 					rotationSpeed: 0.05,
 					revolutionSpeed: 0.0004,
-					distance: 30.07,
+					distance: 30070,
 				},
 			]
 		)
@@ -77,12 +80,12 @@ export default class Sketch {
 
 	static get SATELLITE_PARAMS() {
 		// 月のマテリアルとジオメトリ
-		const moonGeometry = new THREE.SphereGeometry(2, 32, 32);
+		const moonGeometry = new THREE.SphereGeometry(Sketch.filterPlanetSize(1738), 32, 32);
 		const moonMaterial = new THREE.MeshStandardMaterial({ map: new THREE.TextureLoader().load('images/moon.jpg') });
 
 		// 土星の衛星のマテリアルとジオメトリ
+		const saturnSatellitesGeometry = new THREE.TorusGeometry( 2000, 500, 2, 200 );
 		const saturnSatellitesMaterial = new THREE.MeshStandardMaterial({ color:0xcdb07a  });
-		const saturnSatellitesGeometry = new THREE.TorusGeometry( 80, 10, 2, 200 );
 
 		return (
 			[
@@ -93,7 +96,7 @@ export default class Sketch {
 					planet: "earth",
 					rotationSpeed: 0.02,
 					revolutionSpeed: 0.1,
-					distance: 10,
+					distance: 800,
 				},
 				{
 					name: "saturnSatellites",
@@ -113,17 +116,11 @@ export default class Sketch {
 		this.width = window.innerWidth;
 		this.height = window.innerHeight;
 
-		// レンダラ
-		this.renderer = new THREE.WebGLRenderer();
-		this.renderer.setClearColor(new THREE.Color(0x000000));
-		this.renderer.setSize(this.width, this.height);
-		this.container.appendChild(this.renderer.domElement);
-
 		// シーン
 		this.scene = new THREE.Scene();
 
 		// シーンにフォグを追加
-		// this.scene.fog = new THREE.Fog(new THREE.Color(0x000000), 1, 2000);
+		this.scene.fog = new THREE.Fog(new THREE.Color(0x000000), 1, Sketch.filterDistance(70000));
 
 
 		// カメラ
@@ -131,18 +128,39 @@ export default class Sketch {
 			60,
 			window.innerWidth / window.innerHeight,
 			0.1,
-			50000,
+			100000,
 		);
-		this.camera.position.set(10,30,100);
+		this.camera.position.set(2000,2000,15000);
 		this.camera.lookAt(new THREE.Vector3(0.0, 0.0, 0.0));
+
+		// レンダラ
+		this.renderer = new THREE.WebGLRenderer();
+		this.renderer.setClearColor(new THREE.Color(0x000000));
+		this.renderer.setSize(this.width, this.height);
+		this.renderer.shadowMap.enabled = true;
+		this.container.appendChild(this.renderer.domElement);
+
+		this.renderPass = new RenderPass(this.scene, this.camera);
+
+		this.bloomPass = new UnrealBloomPass(
+			new THREE.Vector2(this.width, this.height),
+			0.8,
+			0.8,
+			0.0,
+		);
 
 		// コントロール
 		this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 
 		 // ヘルパー
-		const axesBarLength = 20.0;
+		const axesBarLength = 20000.0;
 		this.axesHelper = new THREE.AxesHelper(axesBarLength);
 		// this.scene.add(this.axesHelper);
+
+		this.effectComposer = new EffectComposer(this.renderer);
+		this.effectComposer.addPass(this.renderPass);
+		this.effectComposer.addPass(this.bloomPass);
+		this.effectComposer.setSize(this.width, this.height);
 
 		this.addObjects();
 		this.addLight()
@@ -176,19 +194,26 @@ export default class Sketch {
 		}, false);
 	}
 
-	filterDistance(distance) {
-		return distance * 100;
+	static filterDistance(distance) {
+		return Math.pow(distance*100, 0.75) + 1000;
 	}
 
-	filterPlanetSize(size) {
-		return size / 1000;
+	static filterPlanetSize(size,mode) {
+		if (mode == "isSun") {
+			return Math.pow(size, 0.55);
+		} else {
+			return Math.pow(size, 0.65);
+		}
 	}
 
 	addObjects() {
 		// 太陽
 		this.sunTexture = new THREE.TextureLoader().load('images/sun.jpg');
-		this.sunGeometry = new THREE.SphereGeometry( 10, 32, 32 );
-		this.sunMaterial = new THREE.MeshBasicMaterial({ map: this.sunTexture });
+		this.sunGeometry = new THREE.SphereGeometry( Sketch.filterPlanetSize(696000,"isSun"), 32, 32 );
+		this.sunMaterial = new THREE.MeshStandardMaterial({color: new THREE.Color(0xfbb245)});
+		this.sunMaterial.emissiveMap = this.sunTexture;
+		this.sunMaterial.emissive = new THREE.Color(0xfbb245);
+		this.sunMaterial.emissiveIntensity = 1.0;
 		this.sunMesh = new THREE.Mesh(this.sunGeometry, this.sunMaterial);
 		this.scene.add(this.sunMesh);
 
@@ -196,6 +221,8 @@ export default class Sketch {
 		Sketch.SATELLITE_PARAMS.forEach((satellite) => {
 			this[satellite.name + "Group"] = new THREE.Group();
 			this[satellite.name + "Mesh"] = new THREE.Mesh(satellite.geometry, satellite.material);
+			this[satellite.name + "Mesh"].castShadow = true;
+			this[satellite.name + "Mesh"].receiveShadow = true;
 			this[satellite.name + "Group"].add(this[satellite.name + "Mesh"]);
 
 			// 土星の衛星を90度回転させる
@@ -206,20 +233,22 @@ export default class Sketch {
 
 		// 惑星の生成
 		Sketch.PLANET_PARAMS.forEach((planet) => {
-			const filteredSize = this.filterPlanetSize(planet.size)
+			const filteredSize = Sketch.filterPlanetSize(planet.size)
 
 			this[planet.name + "Group"] = new THREE.Group();
 			this[planet.name + "Texture"] = new THREE.TextureLoader().load(planet.texture);
 			this[planet.name + "Geometry"] = new THREE.SphereGeometry( filteredSize, 32, 32 );
-			this[planet.name + "Material"] = new THREE.MeshStandardMaterial({ map: this[planet.name + "Texture"] });
+			this[planet.name + "Material"] = new THREE.MeshStandardMaterial({ map: this[planet.name + "Texture"],metalness: 0.5,roughness: 0.5 });
 			this[planet.name + "Mesh"] = new THREE.Mesh(this[planet.name + "Geometry"], this[planet.name + "Material"]);
+			this[planet.name + "Mesh"].castShadow = true;
+			this[planet.name + "Mesh"].receiveShadow = true;
 			planet.satellite ? this[planet.name + "Group"].add(this[planet.name + "Mesh"],this[planet.satellite + "Group"]) : this[planet.name + "Group"].add(this[planet.name + "Mesh"]);
 			this.scene.add(this[planet.name + "Group"]);
 		})
 
 		// 小さい星
 		// 形状データを作成
-		const SIZE = 3000;
+		const SIZE = Sketch.filterDistance(30070);
 		// 配置する個数
 		const LENGTH = 2000;
 		// 頂点情報を格納する配列
@@ -246,8 +275,9 @@ export default class Sketch {
 
 	addLight() {
 		// ポイントライト
-		this.pointLight = new THREE.PointLight(0xffffff, 3, 400);
-		this.pointLight.position.set( 0,0,0);
+		this.pointLight = new THREE.PointLight(0xffffff, 1, Sketch.filterDistance(40000));
+		this.pointLight.position.set(0, 0, 0);
+		this.pointLight.castShadow = true;
 		this.scene.add(this.pointLight);
 
 		// ポイントライトヘルパー
@@ -274,7 +304,7 @@ export default class Sketch {
 			// 衛星の公転速度
 			this[satellite.name + "Group"].rotation.y += satellite.revolutionSpeed;
 			// 衛星の公転の中心（惑星から太陽までの位置）
-			const planetDistance = this.filterDistance(Sketch.PLANET_PARAMS.find(planet => planet.name === satellite.planet).distance);
+			const planetDistance = Sketch.filterDistance(Sketch.PLANET_PARAMS.find(planet => planet.name === satellite.planet).distance);
 			this[satellite.name + "Group"].position.set(0, 0, planetDistance);
 			// 衛星の自転速度
 			this[satellite.name + "Mesh"].rotation.y += satellite.rotationSpeed;
@@ -288,11 +318,11 @@ export default class Sketch {
 			// 惑星の自転速度
 			this[planet.name + "Mesh"].rotation.y += planet.rotationSpeed;
 			// 太陽から惑星までの距離
-			this[planet.name + "Mesh"].position.set(0.0, 0.0, this.filterDistance(planet.distance));
+			this[planet.name + "Mesh"].position.set(0.0, 0.0, Sketch.filterDistance(planet.distance));
 		})
 
 		// 描画フェーズ
-		this.renderer.render(this.scene, this.camera);
+		this.effectComposer.render();
 	}
 }
 
