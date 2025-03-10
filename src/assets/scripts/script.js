@@ -122,12 +122,11 @@ export default class Sketch {
 		// シーンにフォグを追加
 		this.scene.fog = new THREE.Fog(new THREE.Color(0x000000), 1, Sketch.filterDistance(70000));
 
-
 		// カメラ
 		this.camera = new THREE.PerspectiveCamera(
 			60,
 			window.innerWidth / window.innerHeight,
-			0.1,
+			1000,
 			100000,
 		);
 		this.camera.position.set(2000,2000,15000);
@@ -144,7 +143,7 @@ export default class Sketch {
 
 		this.bloomPass = new UnrealBloomPass(
 			new THREE.Vector2(this.width, this.height),
-			0.8,
+			1.2,
 			0.8,
 			0.0,
 		);
@@ -323,6 +322,7 @@ export default class Sketch {
 
 		// 描画フェーズ
 		this.effectComposer.render();
+		// this.renderer.render(this.scene,this.camera);
 	}
 }
 
